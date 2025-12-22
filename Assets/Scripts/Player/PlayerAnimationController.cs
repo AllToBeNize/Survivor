@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(PlayerController))]
 [RequireComponent(typeof(CharacterController))]
@@ -11,6 +12,9 @@ public class PlayerAnimationController : MonoBehaviour
     private CharacterController cc;
     private AttributeBase attribute;
     private WeaponController weaponController;
+
+    [Header("Game Over Settings")]
+    public float deathDelay = 1f; // 默认延迟，可通过动画长度调整
 
     private void Awake()
     {
@@ -55,7 +59,6 @@ public class PlayerAnimationController : MonoBehaviour
             return;
 
         float speed = cc.velocity.magnitude;
-        //Debug.Log($"Speed:{speed}");
         animator.SetFloat("MoveSpeed", speed);
     }
 
@@ -72,5 +75,18 @@ public class PlayerAnimationController : MonoBehaviour
     private void OnDead()
     {
         animator?.SetTrigger("Die");
+
+        StartCoroutine(DelayedGameOver(deathDelay));
+    }
+
+    private IEnumerator DelayedGameOver(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        // 调用游戏管理器的游戏结束逻辑
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetGameOver(GameOverReason.Dead);
+        }
     }
 }

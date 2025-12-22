@@ -3,17 +3,19 @@ using System;
 
 public struct DamageInfo
 {
-    public float BaseDamage;      // 原始伤害
-    public float ArmorPenetration; // 护甲穿透 0~1
-    public bool IsCritical;       // 暴击？
-    public float CriticalMultiplier; // 暴击倍率（如 2x）
+    public float BaseDamage;        // Base damage
+    public float ArmorPenetration;  // 0~1
+    public bool IsCritical;
+    public float CriticalMultiplier;
+    public GameObject Source;       // Damage source
 
-    public DamageInfo(float dmg)
+    public DamageInfo(float dmg, GameObject source = null)
     {
         BaseDamage = dmg;
-        ArmorPenetration = 0;
+        ArmorPenetration = 0f;
         IsCritical = false;
         CriticalMultiplier = 1f;
+        Source = source;
     }
 }
 
@@ -24,27 +26,24 @@ public class AttributeBase : MonoBehaviour
     public float HP = 100f;
     public float Defense = 0f;
 
-    public bool IsInvincible = false;   // 无敌状态
-    private bool isDead = false;        // 确保死亡只触发一次
+    public bool IsInvincible = false;
+    private bool isDead = false;
 
     public event Action OnDead;
-    public event Action<float> OnDamageTaken;   // 最终伤害
+    public event Action<float> OnDamageTaken;
     public event Action<float> OnHeal;
 
     /// <summary>
-    /// 处理伤害（带 DamageInfo 扩展）
+    /// Handles damage with DamageInfo
     /// </summary>
     public float TakeDamage(DamageInfo info)
     {
         if (IsInvincible || isDead) return 0f;
 
-        // 护甲计算：Defense * (1 - 穿透)
         float effectiveDefense = Defense * (1f - info.ArmorPenetration);
 
-        // 最终伤害
         float damage = Mathf.Max(0, info.BaseDamage - effectiveDefense);
 
-        // 暴击
         if (info.IsCritical)
             damage *= info.CriticalMultiplier;
 
@@ -61,7 +60,7 @@ public class AttributeBase : MonoBehaviour
     }
 
     /// <summary>
-    /// 简单版本：仅数值伤害
+    /// Simple version: only numeric damage
     /// </summary>
     public float TakeDamage(float dmg)
     {
@@ -70,7 +69,7 @@ public class AttributeBase : MonoBehaviour
 
     public void Heal(float value)
     {
-        if (isDead) return; // 死了不能加血（如果你想支持复活可删除）
+        if (isDead) return;
 
         float before = HP;
         HP = Mathf.Min(MaxHP, HP + value);
@@ -83,7 +82,7 @@ public class AttributeBase : MonoBehaviour
     public bool IsAlive => !isDead && HP > 0;
 
     /// <summary>
-    /// 给角色添加无敌时间
+    /// Add temporary invincibility
     /// </summary>
     public void AddInvincibility(float time)
     {
@@ -98,4 +97,3 @@ public class AttributeBase : MonoBehaviour
         IsInvincible = false;
     }
 }
-

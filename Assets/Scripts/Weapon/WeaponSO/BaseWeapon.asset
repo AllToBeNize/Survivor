@@ -17,5 +17,5 @@ MonoBehaviour:
   fireInterval: 0.3
   range: 10
   damage: 25
-  bulletSpeed: 10
+  bulletSpeed: 20
   shootOffset: {x: 0, y: 0, z: 1}

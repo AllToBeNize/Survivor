@@ -32,8 +32,6 @@ public class WeaponController : MonoBehaviour
         Vector3 shootDir = (target.position - transform.position);
         shootDir.y = 0f;
 
-        Debug.Log($"Dir:{shootDir}");
-
         rotationController.SetDirection(
             shootDir,
             weaponData.rotationPriority
@@ -72,16 +70,13 @@ public class WeaponController : MonoBehaviour
         return nearest;
     }
 
-    void Fire(Vector3 dir)
+    private void Fire(Vector3 dir)
     {
         Vector3 spawnPos = transform.position +
                            transform.TransformDirection(weaponData.shootOffset);
 
-        //BulletBase bullet = BulletManager.Instance.Spawn(
-        //    spawnPos,
-        //    Quaternion.LookRotation(dir)
-        //);
+        DamageInfo dmg = new DamageInfo(weaponData.damage, gameObject);
 
-        //bullet.transform.forward = dir;
+        BulletManager.Instance.SpawnBullet(spawnPos, dir.normalized, dmg, weaponData.bulletSpeed);
     }
 }

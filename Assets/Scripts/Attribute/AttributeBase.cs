@@ -96,4 +96,17 @@ public class AttributeBase : MonoBehaviour
         yield return new WaitForSeconds(time);
         IsInvincible = false;
     }
+
+    /// <summary>
+    /// Reset HP and death status
+    /// </summary>
+    public void ResetAttribute()
+    {
+        isDead = false;
+        HP = MaxHP;
+        // Optionally reset invincibility
+        IsInvincible = false;
+        // Notify UI or other listeners that HP is fully restored
+        OnHeal?.Invoke(MaxHP);
+    }
 }

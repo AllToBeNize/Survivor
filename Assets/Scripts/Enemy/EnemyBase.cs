@@ -10,14 +10,14 @@ public class EnemyBase : PooledObject
     public float MoveSpeed = 3.5f;
     public float AttackRange = 2f;
     public float AttackCooldown = 1.5f;
-    public Transform AttackPoint;       // Attack origin
-    public float AttackRadius = 1f;     // Detection radius
-    public float AttackDelay = 0.3f;    // Delay before applying damage
+    public Transform AttackPoint;
+    public float AttackRadius = 1f;
+    public float AttackDelay = 0.3f;
     public float AttackDamage = 10f;
     public LayerMask targetLayer;
 
     [Header("Debug")]
-    public bool debugMode = false;      // Enable debug logs
+    public bool debugMode = false;
 
     private NavMeshAgent agent;
     private AttributeBase attr;
@@ -25,26 +25,32 @@ public class EnemyBase : PooledObject
     private Transform target;
     private bool canAttack = true;
     private bool initialized = false;
+    private bool deadSubscribed = false;
 
     private void Awake()
     {
-        // 缓存组件，只执行一次
         if (!initialized)
         {
             initialized = true;
             agent = GetComponent<NavMeshAgent>();
             attr = GetComponent<AttributeBase>();
             animator = GetComponentInChildren<Animator>();
+
+            // Subscribe OnDead once
+            if (!deadSubscribed)
+            {
+                attr.OnDead += Die;
+                deadSubscribed = true;
+            }
         }
     }
 
     private void OnEnable()
     {
-        // 每次激活都重置状态
+        // Reset health and state
         if (attr != null)
         {
-            attr.HP = attr.MaxHP;
-            attr.OnDead += Die;
+            attr.ResetAttribute();
         }
 
         canAttack = true;
@@ -55,7 +61,7 @@ public class EnemyBase : PooledObject
             agent.isStopped = false;
         }
 
-        // 自动寻找 Player
+        // Find player automatically if not assigned
         if (target == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -73,9 +79,6 @@ public class EnemyBase : PooledObject
 
     private void OnDisable()
     {
-        if (attr != null)
-            attr.OnDead -= Die;
-
         if (agent != null && agent.isOnNavMesh)
             agent.isStopped = true;
     }
@@ -163,13 +166,13 @@ public class EnemyBase : PooledObject
         if (animator != null)
             animator.SetTrigger("Die");
 
-        // 延迟回收一帧，避免 NavMeshAgent 报错
+        // Delay despawn by one frame to avoid NavMeshAgent errors
         StartCoroutine(DespawnNextFrame());
     }
 
     private IEnumerator DespawnNextFrame()
     {
-        yield return null; // 等一帧
+        yield return null;
         Despawn();
     }
 

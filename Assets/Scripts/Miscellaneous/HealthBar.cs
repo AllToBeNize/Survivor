@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class HealthBar : MonoBehaviour
 {
@@ -13,23 +14,32 @@ public class HealthBar : MonoBehaviour
     private Camera mainCam;
     private float originalWidth;
 
-    private void Start()
+    [Header("Animation Settings")]
+    public float updateSpeed = 0.5f; // seconds to smoothly update
+
+    private Coroutine updateCoroutine;
+
+    private void Awake()
     {
         mainCam = Camera.main;
 
         target = GetComponentInParent<AttributeBase>();
 
-        if (target != null)
-        {
-            target.OnDamageTaken += UpdateHealth;
-            target.OnHeal += UpdateHealth;
-            target.OnDead += OnDead;
-
-            UpdateHealth(0);
-        }
-
         if (foregroundImage != null)
             originalWidth = foregroundImage.rectTransform.sizeDelta.x;
+    }
+
+    private void OnEnable()
+    {
+        if (target != null)
+        {
+            target.OnDamageTaken += OnHealthChanged;
+            target.OnHeal += OnHealthChanged;
+            target.OnDead += OnDead;
+
+            // Refresh health immediately when enabled
+            UpdateHealthInstant();
+        }
     }
 
     private void LateUpdate()
@@ -37,22 +47,71 @@ public class HealthBar : MonoBehaviour
         if (target == null) return;
 
         Vector3 camForward = mainCam.transform.forward;
-         camForward.y = 0;
+        camForward.y = 0;
         if (camForward.sqrMagnitude > 0.001f)
             transform.forward = camForward.normalized;
     }
 
-    private void UpdateHealth(float _)
+    private void OnHealthChanged(float _)
     {
-        if (target == null || foregroundImage == null) return;
+        if (updateCoroutine != null)
+            StopCoroutine(updateCoroutine);
+
+        updateCoroutine = StartCoroutine(UpdateHealthSmooth());
+    }
+
+    private IEnumerator UpdateHealthSmooth()
+    {
+        if (foregroundImage == null || target == null) yield break;
+
+        float startValue = 0f;
+        float targetValue = target.HP / target.MaxHP;
 
         if (foregroundImage.type == Image.Type.Filled)
+            startValue = foregroundImage.fillAmount;
+        else
+            startValue = foregroundImage.rectTransform.sizeDelta.x / originalWidth;
+
+        float elapsed = 0f;
+
+        while (elapsed < updateSpeed)
         {
-            foregroundImage.fillAmount = target.HP / target.MaxHP;
+            elapsed += Time.deltaTime;
+            float ratio = Mathf.Lerp(startValue, targetValue, elapsed / updateSpeed);
+
+            if (foregroundImage.type == Image.Type.Filled)
+                foregroundImage.fillAmount = ratio;
+            else
+            {
+                Vector2 size = foregroundImage.rectTransform.sizeDelta;
+                size.x = originalWidth * ratio;
+                foregroundImage.rectTransform.sizeDelta = size;
+            }
+
+            yield return null;
         }
+
+        // Ensure final value
+        if (foregroundImage.type == Image.Type.Filled)
+            foregroundImage.fillAmount = targetValue;
         else
         {
-            float ratio = Mathf.Clamp01(target.HP / target.MaxHP);
+            Vector2 size = foregroundImage.rectTransform.sizeDelta;
+            size.x = originalWidth * targetValue;
+            foregroundImage.rectTransform.sizeDelta = size;
+        }
+    }
+
+    private void UpdateHealthInstant()
+    {
+        if (foregroundImage == null || target == null) return;
+
+        float ratio = target.HP / target.MaxHP;
+
+        if (foregroundImage.type == Image.Type.Filled)
+            foregroundImage.fillAmount = ratio;
+        else
+        {
             Vector2 size = foregroundImage.rectTransform.sizeDelta;
             size.x = originalWidth * ratio;
             foregroundImage.rectTransform.sizeDelta = size;
@@ -61,15 +120,16 @@ public class HealthBar : MonoBehaviour
 
     private void OnDead()
     {
-        Destroy(gameObject);
+        target.HP = 0f;
+        OnHealthChanged(0);
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         if (target != null)
         {
-            target.OnDamageTaken -= UpdateHealth;
-            target.OnHeal -= UpdateHealth;
+            target.OnDamageTaken -= OnHealthChanged;
+            target.OnHeal -= OnHealthChanged;
             target.OnDead -= OnDead;
         }
     }

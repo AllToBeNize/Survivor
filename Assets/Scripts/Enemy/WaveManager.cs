@@ -20,15 +20,22 @@ public class WaveManager : MonoSingleton<WaveManager>
 {
     public List<WaveConfigData> waveConfigs = new List<WaveConfigData>();
 
+    [Header("Debug")]
+    public bool debugMode = true;
+
     private int currentWaveIndex = 0;
     private int enemiesAliveThisWave = 0;
+    private float remainingWaveTime = 0f;
+
+    // Events
+    public event System.Action<int, int> OnWaveStarted; // (waveIndex, totalEnemies)
+    public event System.Action<int, int, float> OnWaveProgress; // (waveIndex, remainingEnemies, remainingTime)
+    public event System.Action<int> OnWaveCompleted; // (waveIndex)
 
     private void Start()
     {
         if (waveConfigs.Count > 0)
-        {
             StartCoroutine(SpawnWaveRoutine());
-        }
     }
 
     private IEnumerator SpawnWaveRoutine()
@@ -38,7 +45,7 @@ public class WaveManager : MonoSingleton<WaveManager>
             WaveConfigData wave = waveConfigs[currentWaveIndex];
             enemiesAliveThisWave = 0;
 
-            // Spawn all enemies in this wave immediately
+            // Spawn all enemies
             foreach (var enemyConfig in wave.enemies)
             {
                 for (int i = 0; i < enemyConfig.count; i++)
@@ -52,23 +59,44 @@ public class WaveManager : MonoSingleton<WaveManager>
                 }
             }
 
-            // Wait for all enemies to be dead
+            int totalEnemies = enemiesAliveThisWave;
+            OnWaveStarted?.Invoke(currentWaveIndex + 1, totalEnemies);
+
+            if (debugMode)
+                Debug.Log($"Wave {currentWaveIndex + 1} started. Enemies Remaining: {enemiesAliveThisWave}");
+
+            // Wait for all enemies to die
             while (enemiesAliveThisWave > 0)
             {
-                yield return null;
+                OnWaveProgress?.Invoke(currentWaveIndex + 1, enemiesAliveThisWave, 0f); // no duration yet
+                yield return new WaitForSeconds(1f);
             }
 
-            // Wait duration between waves
-            yield return new WaitForSeconds(wave.durationAfterWave);
+            // Wait duration after wave
+            remainingWaveTime = wave.durationAfterWave;
+            while (remainingWaveTime > 0f)
+            {
+                OnWaveProgress?.Invoke(currentWaveIndex + 1, 0, remainingWaveTime);
+                yield return new WaitForSeconds(1f);
+                remainingWaveTime -= 1f;
+            }
+
+            OnWaveCompleted?.Invoke(currentWaveIndex + 1);
 
             currentWaveIndex++;
         }
 
-        Debug.Log("All waves completed!");
+        if (debugMode)
+            Debug.Log("All waves completed!");
     }
 
     public int RemainingEnemiesInWave()
     {
         return enemiesAliveThisWave;
+    }
+
+    public float RemainingWaveTime()
+    {
+        return remainingWaveTime;
     }
 }

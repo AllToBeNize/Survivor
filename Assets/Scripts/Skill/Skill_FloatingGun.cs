@@ -4,37 +4,46 @@ using UnityEngine;
 public class Skill_FloatingGun : SkillBase
 {
     [Header("Gun Settings")]
-    public Transform gunMuzzle;
-    public float fireRate = 0.2f;
+    public Transform gunMuzzle;          // Bullet spawn point (fixed on model)
+    public float fireRate = 0.2f;        // Seconds between shots
     public float bulletSpeed = 10f;
     public float bulletDamage = 10f;
 
     [Header("Targeting")]
-    public float rotationSpeed = 180f;
-    public float detectionRadius = 15f;
-    public LayerMask enemyLayer;
+    public float rotationSpeed = 180f;   // Degrees per second
+    public float detectionRadius = 15f;  // Enemy detection radius
+    public LayerMask enemyLayer;         // Layers that are considered enemies
+
+    [Header("Debug")]
     public bool debugMode = true;
 
     private Coroutine fireRoutine;
 
+    private EnemyBase currentTarget;
+
     protected override void OnEquip()
     {
         if (gunMuzzle == null)
-            gunMuzzle = transform;
+            gunMuzzle = transform; // fallback
 
         fireRoutine = StartCoroutine(FireRoutine());
+    }
+
+    private void Update()
+    {
+        if (!isEquipped) return;
+
+        currentTarget = FindNearestEnemy();
+        if (currentTarget != null)
+            RotateTowardsTarget(currentTarget);
     }
 
     private IEnumerator FireRoutine()
     {
         while (isEquipped)
         {
-            EnemyBase targetEnemy = FindNearestEnemy();
-            if (targetEnemy != null)
-            {
-                RotateTowardsTarget(targetEnemy);
+            if (currentTarget != null)
                 Shoot();
-            }
 
             yield return new WaitForSeconds(fireRate);
         }
@@ -59,6 +68,7 @@ public class Skill_FloatingGun : SkillBase
                 }
             }
         }
+
         return nearestEnemy;
     }
 
@@ -73,13 +83,12 @@ public class Skill_FloatingGun : SkillBase
 
         Quaternion targetRot = Quaternion.LookRotation(dir);
         Quaternion finalRot = Quaternion.RotateTowards(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+        transform.rotation = finalRot;
 
         if (debugMode)
         {
             Debug.Log($"[FloatingGun] Target: {enemy.name}, HeadPos: {headPos}, TargetRot: {targetRot.eulerAngles}, FinalRot: {finalRot.eulerAngles}");
         }
-
-        transform.rotation = finalRot;
     }
 
     private void Shoot()

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 [RequireComponent(typeof(PlayerRotationController))]
 public class WeaponController : MonoBehaviour
@@ -17,6 +18,9 @@ public class WeaponController : MonoBehaviour
     private GameObject weaponModelInstance;
     private Transform muzzlePoint;
 
+    // Event triggered when weapon fires
+    public event Action OnWeaponFired;
+
     private void Start()
     {
         rotationController = GetComponent<PlayerRotationController>();
@@ -24,48 +28,28 @@ public class WeaponController : MonoBehaviour
         if (weaponData == null)
             return;
 
-        // Find mount point on player by name
-        mountPoint = transform.Find(weaponData.mountPointName);
-        if (mountPoint == null)
-        {
-            Debug.LogWarning($"Mount point '{weaponData.mountPointName}' not found on player. Using player root.");
-            mountPoint = transform;
-        }
+        mountPoint = transform.Find(weaponData.mountPointName) ?? transform;
 
-        // Instantiate weapon model
         if (weaponData.modelPrefab != null)
         {
-            weaponModelInstance = Instantiate(
-                weaponData.modelPrefab,
-                mountPoint.position,
-                mountPoint.rotation,
-                mountPoint
-            );
+            weaponModelInstance = Instantiate(weaponData.modelPrefab, mountPoint.position, mountPoint.rotation, mountPoint);
 
-            // Find muzzle point on model by name
-            if (!string.IsNullOrEmpty(weaponData.muzzlePointName))
-            {
-                muzzlePoint = weaponModelInstance.transform.Find(weaponData.muzzlePointName);
-                if (muzzlePoint == null)
-                {
-                    Debug.LogWarning($"Muzzle point '{weaponData.muzzlePointName}' not found on weapon model. Using model root.");
-                    muzzlePoint = weaponModelInstance.transform;
-                }
-            }
-            else
-            {
-                muzzlePoint = weaponModelInstance.transform;
-            }
+            muzzlePoint = string.IsNullOrEmpty(weaponData.muzzlePointName)
+                ? weaponModelInstance.transform
+                : weaponModelInstance.transform.Find(weaponData.muzzlePointName) ?? weaponModelInstance.transform;
         }
         else
         {
-            // Fallback if no model prefab
             muzzlePoint = transform;
         }
     }
 
     private void Update()
     {
+        if (!PlayerManager.Instance.IsPlayerAlive())
+        {
+            return;
+        }
         if (weaponData == null || rotationController == null)
             return;
 
@@ -75,14 +59,11 @@ public class WeaponController : MonoBehaviour
         if (target == null)
             return;
 
-        // Direction in XZ plane
         Vector3 shootDir = target.position - transform.position;
         shootDir.y = 0f;
 
-        // Rotate player/weapon
         rotationController.SetDirection(shootDir, weaponData.rotationPriority);
 
-        // Fire
         if (fireTimer <= 0f)
         {
             Fire(shootDir);
@@ -92,11 +73,7 @@ public class WeaponController : MonoBehaviour
 
     private Transform FindTarget()
     {
-        Collider[] hits = Physics.OverlapSphere(
-            transform.position,
-            weaponData.range,
-            enemyLayer
-        );
+        Collider[] hits = Physics.OverlapSphere(transform.position, weaponData.range, enemyLayer);
 
         Transform nearest = null;
         float minDist = float.MaxValue;
@@ -128,5 +105,8 @@ public class WeaponController : MonoBehaviour
         DamageInfo dmg = new DamageInfo(weaponData.damage, gameObject);
 
         BulletManager.Instance.SpawnBullet(spawnPos, forwardDir.normalized, dmg, weaponData.bulletSpeed);
+
+        // Trigger the event
+        OnWeaponFired?.Invoke();
     }
 }

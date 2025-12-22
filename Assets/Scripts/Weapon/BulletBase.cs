@@ -11,11 +11,15 @@ public class BulletBase : PooledObject
     private float timer;
     private bool isActive = false;
 
-    public void Fire(Vector3 startPosition, Vector3 direction, DamageInfo damage, float speedOverride = -1f)
+    // New: whether to ignore the damage source
+    private bool ignoreSource = true;
+
+    public void Fire(Vector3 startPosition, Vector3 direction, DamageInfo damage, float speedOverride = -1f, bool ignoreSource = true)
     {
         transform.position = startPosition;
         this.direction = direction.normalized;
         this.damageInfo = damage;
+        this.ignoreSource = ignoreSource;
 
         if (speedOverride > 0)
             speed = speedOverride;
@@ -53,6 +57,10 @@ public class BulletBase : PooledObject
     private void OnTriggerEnter(Collider other)
     {
         if (!isActive) return;
+
+        // Ignore the source if requested
+        if (ignoreSource && damageInfo.Source != null && other.gameObject == damageInfo.Source)
+            return;
 
         var attr = other.GetComponent<AttributeBase>();
         if (attr != null && attr.IsAlive)

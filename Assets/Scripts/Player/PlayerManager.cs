@@ -27,4 +27,9 @@ public class PlayerManager : MonoSingleton<PlayerManager>
     {
         return player_attr;
     }
+
+    public bool IsPlayerAlive()
+    {
+        return player_attr.IsAlive;
+    }
 }

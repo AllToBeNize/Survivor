@@ -135,6 +135,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Gun_M41D
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 324e45f17a0cb894c8a65914ce721f21, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 324e45f17a0cb894c8a65914ce721f21, type: 3}
 --- !u!4 &8868944745847306229 stripped

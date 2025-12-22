@@ -36,6 +36,10 @@ public class PlayerRotationController : MonoBehaviour
 
     void LateUpdate()
     {
+        if (!PlayerManager.Instance.IsPlayerAlive())
+        {
+            return;
+        }
         if (!hasRequest)
             return;
 

@@ -18,4 +18,7 @@ MonoBehaviour:
   range: 10
   damage: 25
   bulletSpeed: 20
-  shootOffset: {x: 0, y: 0, z: 1}
+  shootOffset: {x: 0, y: 0, z: 0}
+  modelPrefab: {fileID: 8979732615376108998, guid: 9a7e1d7acf84aa543996e802b5d4cf19, type: 3}
+  mountPointName: Socket_Weapon
+  muzzlePointName: Muzzle

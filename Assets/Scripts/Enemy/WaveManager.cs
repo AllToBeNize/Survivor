@@ -53,7 +53,14 @@ public class WaveManager : MonoSingleton<WaveManager>
                     EnemyBase enemy = EnemyManager.Instance.SpawnEnemyRandom(enemyConfig.enemyType);
                     if (enemy != null)
                     {
-                        enemy.GetAttribute().OnDead += () => { enemiesAliveThisWave--; };
+                        var attr = enemy.GetAttribute();
+
+                        // 先解绑自己之前绑定的回调（不会影响其他系统的绑定）
+                        attr.OnDead -= OnEnemyDied;
+
+                        // 再绑定
+                        attr.OnDead += OnEnemyDied;
+
                         enemiesAliveThisWave++;
                     }
                 }
@@ -68,7 +75,7 @@ public class WaveManager : MonoSingleton<WaveManager>
             // Wait for all enemies to die
             while (enemiesAliveThisWave > 0)
             {
-                OnWaveProgress?.Invoke(currentWaveIndex + 1, enemiesAliveThisWave, 0f); // no duration yet
+                OnWaveProgress?.Invoke(currentWaveIndex + 1, enemiesAliveThisWave, 0f);
                 yield return new WaitForSeconds(1f);
             }
 
@@ -90,6 +97,11 @@ public class WaveManager : MonoSingleton<WaveManager>
             Debug.Log("All waves completed!");
     }
 
+    private void OnEnemyDied()
+    {
+        enemiesAliveThisWave--;
+    }
+
     public int RemainingEnemiesInWave()
     {
         return enemiesAliveThisWave;
@@ -98,5 +110,10 @@ public class WaveManager : MonoSingleton<WaveManager>
     public float RemainingWaveTime()
     {
         return remainingWaveTime;
+    }
+
+    public int TotalWaves()
+    {
+        return waveConfigs.Count;
     }
 }

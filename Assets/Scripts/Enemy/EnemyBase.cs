@@ -66,6 +66,11 @@ public class EnemyBase : PooledObject
         }
     }
 
+    public AttributeBase GetAttribute()
+    {
+        return attr;
+    }
+
     private void OnDisable()
     {
         if (attr != null)

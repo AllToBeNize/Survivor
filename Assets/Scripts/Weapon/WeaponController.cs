@@ -13,14 +13,60 @@ public class WeaponController : MonoBehaviour
 
     private float fireTimer;
 
+    private Transform mountPoint;
+    private GameObject weaponModelInstance;
+    private Transform muzzlePoint;
+
     private void Start()
     {
         rotationController = GetComponent<PlayerRotationController>();
+
+        if (weaponData == null)
+            return;
+
+        // Find mount point on player by name
+        mountPoint = transform.Find(weaponData.mountPointName);
+        if (mountPoint == null)
+        {
+            Debug.LogWarning($"Mount point '{weaponData.mountPointName}' not found on player. Using player root.");
+            mountPoint = transform;
+        }
+
+        // Instantiate weapon model
+        if (weaponData.modelPrefab != null)
+        {
+            weaponModelInstance = Instantiate(
+                weaponData.modelPrefab,
+                mountPoint.position,
+                mountPoint.rotation,
+                mountPoint
+            );
+
+            // Find muzzle point on model by name
+            if (!string.IsNullOrEmpty(weaponData.muzzlePointName))
+            {
+                muzzlePoint = weaponModelInstance.transform.Find(weaponData.muzzlePointName);
+                if (muzzlePoint == null)
+                {
+                    Debug.LogWarning($"Muzzle point '{weaponData.muzzlePointName}' not found on weapon model. Using model root.");
+                    muzzlePoint = weaponModelInstance.transform;
+                }
+            }
+            else
+            {
+                muzzlePoint = weaponModelInstance.transform;
+            }
+        }
+        else
+        {
+            // Fallback if no model prefab
+            muzzlePoint = transform;
+        }
     }
 
     private void Update()
     {
-        if (weaponData == null)
+        if (weaponData == null || rotationController == null)
             return;
 
         fireTimer -= Time.deltaTime;
@@ -29,20 +75,21 @@ public class WeaponController : MonoBehaviour
         if (target == null)
             return;
 
-        Vector3 shootDir = (target.position - transform.position);
+        // Direction in XZ plane
+        Vector3 shootDir = target.position - transform.position;
         shootDir.y = 0f;
 
-        rotationController.SetDirection(
-            shootDir,
-            weaponData.rotationPriority
-        );
+        // Rotate player/weapon
+        rotationController.SetDirection(shootDir, weaponData.rotationPriority);
 
+        // Fire
         if (fireTimer <= 0f)
         {
             Fire(shootDir);
             fireTimer = weaponData.fireInterval;
         }
     }
+
     private Transform FindTarget()
     {
         Collider[] hits = Physics.OverlapSphere(
@@ -56,10 +103,7 @@ public class WeaponController : MonoBehaviour
 
         foreach (var hit in hits)
         {
-            float dist = Vector3.SqrMagnitude(
-                hit.transform.position - transform.position
-            );
-
+            float dist = Vector3.SqrMagnitude(hit.transform.position - transform.position);
             if (dist < minDist)
             {
                 minDist = dist;
@@ -72,11 +116,17 @@ public class WeaponController : MonoBehaviour
 
     private void Fire(Vector3 dir)
     {
-        Vector3 spawnPos = transform.position +
-                           transform.TransformDirection(weaponData.shootOffset);
+        if (BulletManager.Instance == null)
+            return;
+
+        Vector3 spawnPos = (muzzlePoint != null ? muzzlePoint.position : transform.position) +
+                           (muzzlePoint != null ? muzzlePoint.forward : transform.forward) * 0f +
+                           weaponData.shootOffset;
+
+        Vector3 forwardDir = muzzlePoint != null ? muzzlePoint.forward : transform.forward;
 
         DamageInfo dmg = new DamageInfo(weaponData.damage, gameObject);
 
-        BulletManager.Instance.SpawnBullet(spawnPos, dir.normalized, dmg, weaponData.bulletSpeed);
+        BulletManager.Instance.SpawnBullet(spawnPos, forwardDir.normalized, dmg, weaponData.bulletSpeed);
     }
 }

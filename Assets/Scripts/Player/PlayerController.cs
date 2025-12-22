@@ -25,6 +25,8 @@ public class PlayerController : MonoBehaviour
 
         if (cameraTransform == null)
             cameraTransform = Camera.main.transform;
+
+        PlayerManager.Instance.InitPlayer(gameObject);
     }
 
     void Update()

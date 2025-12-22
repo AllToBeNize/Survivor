@@ -14,7 +14,7 @@ public class Panel_GameOver : MonoBehaviour
 
     public void RePlay()
     {
-        LevelManager.Instance.Play();
+        LevelManager.Instance.ReloadCurrentLevel();
     }
 
     public void ReturnMenu()

@@ -7,7 +7,6 @@ public class LevelManager : MonoSingleton<LevelManager>
     [SerializeField] private string loadingSceneName = "Loading";
 
     public string StartSceneName = "Start";
-
     public string GameSceneName = "Game";
 
     private string targetSceneName = "Game";
@@ -43,5 +42,14 @@ public class LevelManager : MonoSingleton<LevelManager>
     public string GetTargetScene()
     {
         return targetSceneName;
+    }
+
+    /// <summary>
+    /// 直接重新加载当前场景，不走 Loading
+    /// </summary>
+    public void ReloadCurrentLevel()
+    {
+        string currentScene = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(currentScene);
     }
 }

@@ -15,7 +15,7 @@ public class Skill_FloatingGun : SkillBase
     public LayerMask enemyLayer;         // Layers that are considered enemies
 
     [Header("Debug")]
-    public bool debugMode = true;
+    public bool debugMode = false;
 
     private Coroutine fireRoutine;
 

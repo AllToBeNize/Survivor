@@ -16,60 +16,37 @@ public class PlayerRotationController : MonoBehaviour
 
     private Vector3 desiredDir;
     private RotationPriority currentPriority = RotationPriority.None;
-    private int lastRequestFrame = -1;
+    private bool hasRequest;
 
     public void SetDirection(Vector3 dir, RotationPriority priority)
     {
         if (dir.sqrMagnitude < 0.0001f)
             return;
 
-        Debug.Log(
-            $"[Rotation] SetDirection frame={Time.frameCount} " +
-            $"priority={priority} dir={dir}"
-        );
-
-        if (Time.frameCount != lastRequestFrame)
-        {
-            currentPriority = RotationPriority.None;
-        }
-
         if (priority < currentPriority)
-        {
-            Debug.Log(
-                $"[Rotation] Rejected by priority. " +
-                $"current={currentPriority}, incoming={priority}"
-            );
             return;
-        }
 
         dir.y = 0f;
         desiredDir = dir.normalized;
         currentPriority = priority;
-        lastRequestFrame = Time.frameCount;
+        hasRequest = true;
+
+        //Debug.Log($"[Rotation] Accept {priority} dir={desiredDir}");
     }
 
-    void Update()
+    void LateUpdate()
     {
-        if (lastRequestFrame != Time.frameCount)
+        if (!hasRequest)
             return;
-
-        if (desiredDir == Vector3.zero)
-            return;
-
-        Debug.Log(
-            $"[Rotation] Apply rotation frame={Time.frameCount} " +
-            $"dir={desiredDir} forward(before)={transform.forward}"
-        );
 
         Quaternion targetRot = Quaternion.LookRotation(desiredDir);
-        transform.rotation = Quaternion.Slerp(
+        transform.rotation = Quaternion.RotateTowards(
             transform.rotation,
             targetRot,
-            rotateSpeed * Time.deltaTime
+            rotateSpeed * 360f * Time.deltaTime
         );
 
-        Debug.Log(
-            $"[Rotation] forward(after)={transform.forward}"
-        );
+        hasRequest = false;
+        currentPriority = RotationPriority.None;
     }
 }

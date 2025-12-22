@@ -16,6 +16,9 @@ public class EnemyBase : PooledObject
     public float AttackDamage = 10f;
     public LayerMask targetLayer;
 
+    [Header("Debug")]
+    public bool debugMode = false;      // Enable debug logs
+
     private NavMeshAgent agent;
     private AttributeBase attr;
     private Animator animator;
@@ -52,12 +55,14 @@ public class EnemyBase : PooledObject
             agent.isStopped = false;
         }
 
-        // 激活时找目标（场景直接放置时自动找 Player）
+        // 自动寻找 Player
         if (target == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
                 target = playerObj.transform;
+            else if (debugMode)
+                Debug.LogWarning($"{name} cannot find Player in scene!");
         }
     }
 
@@ -83,8 +88,12 @@ public class EnemyBase : PooledObject
                 agent.isStopped = false;
                 agent.SetDestination(target.position);
             }
+
             if (animator != null)
                 animator.SetBool("IsMoving", true);
+
+            if (debugMode)
+                Debug.Log($"{name} moving towards {target.name}");
         }
         else
         {
@@ -111,17 +120,17 @@ public class EnemyBase : PooledObject
         if (animator != null)
             animator.SetTrigger("Attack");
 
-        Debug.Log($"{name} starts attack on {target?.name}");
+        if (debugMode)
+            Debug.Log($"{name} starts attack on {target?.name}");
 
         yield return new WaitForSeconds(AttackDelay);
 
         if (AttackPoint != null)
         {
             Collider[] hits = Physics.OverlapSphere(AttackPoint.position, AttackRadius, targetLayer);
-            if (hits.Length == 0)
-            {
+            if (hits.Length == 0 && debugMode)
                 Debug.Log($"{name} attack hit nothing.");
-            }
+
             foreach (var hit in hits)
             {
                 var targetAttr = hit.GetComponent<AttributeBase>();
@@ -129,11 +138,13 @@ public class EnemyBase : PooledObject
                 {
                     DamageInfo dmg = new DamageInfo(AttackDamage, gameObject);
                     float applied = targetAttr.TakeDamage(dmg);
-                    Debug.Log($"{name} hit {targetAttr.name} for {applied} damage. Target HP: {targetAttr.HP}");
+
+                    if (debugMode)
+                        Debug.Log($"{name} hit {targetAttr.name} for {applied} damage. Target HP: {targetAttr.HP}");
                 }
             }
         }
-        else
+        else if (debugMode)
         {
             Debug.LogWarning($"{name} has no AttackPoint assigned.");
         }
@@ -141,7 +152,6 @@ public class EnemyBase : PooledObject
         yield return new WaitForSeconds(AttackCooldown - AttackDelay);
         canAttack = true;
     }
-
 
     private void Die()
     {

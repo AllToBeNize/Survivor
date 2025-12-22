@@ -12,6 +12,25 @@ public class Panel_GameOver : MonoBehaviour
         GameManager.Instance.OnGameOverd += OnGameOver;
     }
 
+    public void RePlay()
+    {
+        LevelManager.Instance.Play();
+    }
+
+    public void ReturnMenu()
+    {
+        LevelManager.Instance.ReturnMenu();
+    }
+
+    public void ExitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
     private void OnDestroy()
     {
         if (GameManager.Instance != null)

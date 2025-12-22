@@ -90,6 +90,14 @@ public class WaveManager : MonoSingleton<WaveManager>
 
             OnWaveCompleted?.Invoke(currentWaveIndex + 1);
 
+            if (currentWaveIndex == waveConfigs.Count - 1)
+            {
+                if (debugMode)
+                    Debug.Log("Last wave completed. Ending game...");
+
+                GameManager.Instance.SetGameOver(GameOverReason.Win);
+            }
+
             currentWaveIndex++;
         }
 

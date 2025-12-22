@@ -4,38 +4,76 @@ using UnityEngine;
 public class Skill_FloatingGun : SkillBase
 {
     [Header("Gun Settings")]
-    public Transform gunMuzzle;          // Bullet spawn point (fixed on model)
-    public float fireRate = 0.2f;        // Seconds between shots
+    public Transform gunMuzzle;
+    public float fireRate = 0.2f;
     public float bulletSpeed = 10f;
     public float bulletDamage = 10f;
 
     [Header("Targeting")]
-    public float rotationSpeed = 180f;   // Degrees per second
-    public float detectionRadius = 15f;  // Enemy detection radius
-    public LayerMask enemyLayer;         // Layers that are considered enemies
+    public float rotationSpeed = 180f;
+    public float detectionRadius = 15f;
+    public LayerMask enemyLayer;
+
+    [Header("Idle Rotation")]
+    public float idleRotationSpeed = 30f; // Degrees per second
+    public float idleRotationRange = 60f; // Max angle from initial forward
+    private float idleAngle = 0f;
+    private int idleDirection = 1;
 
     [Header("Debug")]
     public bool debugMode = false;
 
     private Coroutine fireRoutine;
-
     private EnemyBase currentTarget;
+    private Vector3 followOffset;
+    private Quaternion initialRotation;
 
     protected override void OnEquip()
     {
+        if (owner == null) return;
+
+        // 记录偏移
+        followOffset = transform.position - owner.position;
+
+        // 取消 parent
+        transform.SetParent(null);
+
         if (gunMuzzle == null)
-            gunMuzzle = transform; // fallback
+            gunMuzzle = transform;
+
+        // 保存初始朝向
+        initialRotation = transform.rotation;
 
         fireRoutine = StartCoroutine(FireRoutine());
     }
 
     private void Update()
     {
-        if (!isEquipped) return;
+        if (!isEquipped || owner == null) return;
+
+        // 跟随玩家位置
+        transform.position = owner.position + followOffset;
 
         currentTarget = FindNearestEnemy();
         if (currentTarget != null)
             RotateTowardsTarget(currentTarget);
+        else
+            RotateIdle();
+    }
+
+    private void RotateIdle()
+    {
+        // Idle 旋转来回摆动
+        float delta = idleRotationSpeed * Time.deltaTime * idleDirection;
+        idleAngle += delta;
+
+        if (Mathf.Abs(idleAngle) > idleRotationRange)
+        {
+            idleAngle = Mathf.Clamp(idleAngle, -idleRotationRange, idleRotationRange);
+            idleDirection *= -1; // 反向
+        }
+
+        transform.rotation = initialRotation * Quaternion.Euler(0f, idleAngle, 0f);
     }
 
     private IEnumerator FireRoutine()
@@ -78,17 +116,13 @@ public class Skill_FloatingGun : SkillBase
 
         Vector3 headPos = enemy.GetHeadLocation();
         Vector3 dir = (headPos - transform.position).normalized;
-
         if (dir.sqrMagnitude < 0.001f) return;
 
         Quaternion targetRot = Quaternion.LookRotation(dir);
-        Quaternion finalRot = Quaternion.RotateTowards(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
-        transform.rotation = finalRot;
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
 
         if (debugMode)
-        {
-            Debug.Log($"[FloatingGun] Target: {enemy.name}, HeadPos: {headPos}, TargetRot: {targetRot.eulerAngles}, FinalRot: {finalRot.eulerAngles}");
-        }
+            Debug.Log($"[FloatingGun] Target: {enemy.name}, Dir: {dir}");
     }
 
     private void Shoot()
@@ -96,7 +130,6 @@ public class Skill_FloatingGun : SkillBase
         if (BulletManager.Instance == null) return;
 
         DamageInfo dmg = new DamageInfo(bulletDamage, owner.gameObject);
-
         Vector3 spawnPos = gunMuzzle != null ? gunMuzzle.position : transform.position;
         Vector3 forwardDir = gunMuzzle != null ? gunMuzzle.forward : transform.forward;
 

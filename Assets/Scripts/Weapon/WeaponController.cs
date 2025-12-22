@@ -46,7 +46,7 @@ public class WeaponController : MonoBehaviour
 
     private void Update()
     {
-        if (!PlayerManager.Instance.IsPlayerAlive())
+        if (PlayerManager.Instance != null && !PlayerManager.Instance.IsPlayerAlive()) 
         {
             return;
         }

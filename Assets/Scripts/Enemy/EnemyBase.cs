@@ -11,6 +11,7 @@ public class EnemyBase : PooledObject
     public float AttackRange = 2f;
     public float AttackCooldown = 1.5f;
     public Transform AttackPoint;
+    public Transform HeadTransform;
     public float AttackRadius = 1f;
     public float AttackDelay = 0.3f;
     public float AttackDamage = 10f;
@@ -75,6 +76,13 @@ public class EnemyBase : PooledObject
     public AttributeBase GetAttribute()
     {
         return attr;
+    }
+    public Vector3 GetHeadLocation()
+    {
+        if (HeadTransform != null)
+            return HeadTransform.position;
+
+        return transform.position + Vector3.up * 1.5f;
     }
 
     private void OnDisable()

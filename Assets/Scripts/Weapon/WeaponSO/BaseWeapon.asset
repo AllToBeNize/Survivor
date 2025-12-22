@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 0
   rotationPriority: 10
-  fireInterval: 0.3
+  fireInterval: 0.2
   range: 10
   damage: 25
   bulletSpeed: 20

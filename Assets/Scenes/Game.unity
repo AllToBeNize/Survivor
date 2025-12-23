@@ -3762,14 +3762,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: PanelWave
       objectReference: {fileID: 0}
-    - target: {fileID: 2711833159285163728, guid: dbacd935d11448b4b88c2782b988cfcf, type: 3}
-      propertyPath: m_text
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2711833159285163728, guid: dbacd935d11448b4b88c2782b988cfcf, type: 3}
-      propertyPath: m_fontSize
-      value: 36
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dbacd935d11448b4b88c2782b988cfcf, type: 3}
 --- !u!1001 &3612457832960407187

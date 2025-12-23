@@ -17,6 +17,9 @@ public class EnemyBase : PooledObject
     public float AttackDamage = 10f;
     public LayerMask targetLayer;
 
+    [Header("Layer Settings")]
+    public string DeadLayerName = "Dead";
+
     [Header("Debug")]
     public bool debugMode = false;
 
@@ -24,37 +27,55 @@ public class EnemyBase : PooledObject
     private AttributeBase attr;
     private Animator animator;
     private Transform target;
+
     private bool canAttack = true;
     private bool initialized = false;
     private bool deadSubscribed = false;
 
+    private Collider[] cachedColliders;
+    private Transform[] cachedTransforms;
+    private int[] cachedLayers;
+    private int deadLayer;
+
     private void Awake()
     {
-        if (!initialized)
-        {
-            initialized = true;
-            agent = GetComponent<NavMeshAgent>();
-            attr = GetComponent<AttributeBase>();
-            animator = GetComponentInChildren<Animator>();
+        if (initialized) return;
+        initialized = true;
 
-            // Subscribe OnDead once
-            if (!deadSubscribed)
-            {
-                attr.OnDead += Die;
-                deadSubscribed = true;
-            }
+        agent = GetComponent<NavMeshAgent>();
+        attr = GetComponent<AttributeBase>();
+        animator = GetComponentInChildren<Animator>();
+
+        cachedColliders = GetComponentsInChildren<Collider>(true);
+        cachedTransforms = GetComponentsInChildren<Transform>(true);
+
+        cachedLayers = new int[cachedTransforms.Length];
+        for (int i = 0; i < cachedTransforms.Length; i++)
+        {
+            cachedLayers[i] = cachedTransforms[i].gameObject.layer;
+        }
+
+        deadLayer = LayerMask.NameToLayer(DeadLayerName);
+        if (deadLayer == -1)
+        {
+            Debug.LogError($"Layer '{DeadLayerName}' does not exist!");
+        }
+
+        if (!deadSubscribed)
+        {
+            attr.OnDead += Die;
+            deadSubscribed = true;
         }
     }
 
     private void OnEnable()
     {
-        // Reset health and state
         if (attr != null)
-        {
             attr.ResetAttribute();
-        }
 
         canAttack = true;
+
+        SetAliveState();
 
         if (agent != null && agent.isOnNavMesh)
         {
@@ -62,27 +83,14 @@ public class EnemyBase : PooledObject
             agent.isStopped = false;
         }
 
-        // Find player automatically if not assigned
         if (target == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
                 target = playerObj.transform;
             else if (debugMode)
-                Debug.LogWarning($"{name} cannot find Player in scene!");
+                Debug.LogWarning($"{name} cannot find Player!");
         }
-    }
-
-    public AttributeBase GetAttribute()
-    {
-        return attr;
-    }
-    public Vector3 GetHeadLocation()
-    {
-        if (HeadTransform != null)
-            return HeadTransform.position;
-
-        return transform.position + Vector3.up * 1.5f;
     }
 
     private void OnDisable()
@@ -93,7 +101,8 @@ public class EnemyBase : PooledObject
 
     private void Update()
     {
-        if (target == null || attr == null || !attr.IsAlive) return;
+        if (target == null || attr == null || !attr.IsAlive)
+            return;
 
         float dist = Vector3.Distance(transform.position, target.position);
 
@@ -107,9 +116,6 @@ public class EnemyBase : PooledObject
 
             if (animator != null)
                 animator.SetBool("IsMoving", true);
-
-            if (debugMode)
-                Debug.Log($"{name} moving towards {target.name}");
         }
         else
         {
@@ -124,11 +130,6 @@ public class EnemyBase : PooledObject
         }
     }
 
-    public void SetTarget(Transform t)
-    {
-        target = t;
-    }
-
     private IEnumerator AttackRoutine()
     {
         canAttack = false;
@@ -136,16 +137,15 @@ public class EnemyBase : PooledObject
         if (animator != null)
             animator.SetTrigger("Attack");
 
-        if (debugMode)
-            Debug.Log($"{name} starts attack on {target?.name}");
-
         yield return new WaitForSeconds(AttackDelay);
 
         if (AttackPoint != null)
         {
-            Collider[] hits = Physics.OverlapSphere(AttackPoint.position, AttackRadius, targetLayer);
-            if (hits.Length == 0 && debugMode)
-                Debug.Log($"{name} attack hit nothing.");
+            Collider[] hits = Physics.OverlapSphere(
+                AttackPoint.position,
+                AttackRadius,
+                targetLayer
+            );
 
             foreach (var hit in hits)
             {
@@ -153,35 +153,79 @@ public class EnemyBase : PooledObject
                 if (targetAttr != null && targetAttr.IsAlive)
                 {
                     DamageInfo dmg = new DamageInfo(AttackDamage, gameObject);
-                    float applied = targetAttr.TakeDamage(dmg);
-
-                    if (debugMode)
-                        Debug.Log($"{name} hit {targetAttr.name} for {applied} damage. Target HP: {targetAttr.HP}");
+                    targetAttr.TakeDamage(dmg);
                 }
             }
         }
-        else if (debugMode)
-        {
-            Debug.LogWarning($"{name} has no AttackPoint assigned.");
-        }
 
-        yield return new WaitForSeconds(AttackCooldown - AttackDelay);
+        yield return new WaitForSeconds(Mathf.Max(0f, AttackCooldown - AttackDelay));
         canAttack = true;
     }
 
     private void Die()
     {
+        SetDeadState();
+
         if (animator != null)
             animator.SetTrigger("Die");
 
-        // Delay despawn by one frame to avoid NavMeshAgent errors
-        StartCoroutine(DespawnNextFrame());
+        StartCoroutine(DespawnAfterDelay());
     }
 
-    private IEnumerator DespawnNextFrame()
+    private IEnumerator DespawnAfterDelay()
     {
-        yield return null;
+        yield return new WaitForSeconds(3f);
         Despawn();
+    }
+
+    private void SetDeadState()
+    {
+        canAttack = false;
+
+        if (agent != null && agent.isOnNavMesh)
+            agent.isStopped = true;
+
+        for (int i = 0; i < cachedColliders.Length; i++)
+            cachedColliders[i].enabled = false;
+
+        if (deadLayer != -1)
+        {
+            for (int i = 0; i < cachedTransforms.Length; i++)
+                cachedTransforms[i].gameObject.layer = deadLayer;
+        }
+    }
+
+    private void SetAliveState()
+    {
+        for (int i = 0; i < cachedColliders.Length; i++)
+            cachedColliders[i].enabled = true;
+
+        for (int i = 0; i < cachedTransforms.Length; i++)
+        {
+            if (cachedTransforms[i] != null)
+                cachedTransforms[i].gameObject.layer = cachedLayers[i];
+        }
+
+        if (agent != null)
+            agent.enabled = true;
+    }
+
+    public AttributeBase GetAttribute()
+    {
+        return attr;
+    }
+
+    public Vector3 GetHeadLocation()
+    {
+        if (HeadTransform != null)
+            return HeadTransform.position;
+
+        return transform.position + Vector3.up * 1.5f;
+    }
+
+    public void SetTarget(Transform t)
+    {
+        target = t;
     }
 
     private void OnDrawGizmosSelected()

@@ -39,7 +39,7 @@ public class GameManager : SceneSingleton<GameManager>
 
     private void Update()
     {
-        if (!IsPause)
+        if (!IsPause && CurrentPhase == GamePhase.Playing)
         {
             gameDuration += Time.deltaTime;
         }

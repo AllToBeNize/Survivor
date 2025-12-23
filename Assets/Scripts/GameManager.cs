@@ -2,6 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+public enum GamePhase
+{
+    None,
+    Prepare,
+    Playing,
+    GameOver
+}
+
 public enum GameOverReason
 {
     Dead,
@@ -11,12 +19,13 @@ public enum GameOverReason
 public class GameManager : SceneSingleton<GameManager>
 {
     public bool IsPause { get; private set; }
-
     public bool IsGameOver { get; private set; }
 
-    public UnityAction<bool> OnPauseChanged;
+    public GamePhase CurrentPhase { get; private set; } = GamePhase.None;
 
+    public UnityAction<bool> OnPauseChanged;
     public UnityAction<GameOverReason> OnGameOverd;
+    public UnityAction<GamePhase> OnPhaseChanged;
 
     private float gameDuration = 0f;
 
@@ -24,6 +33,8 @@ public class GameManager : SceneSingleton<GameManager>
     {
         base.Awake();
         Cursor.visible = false;
+
+        SetPhase(GamePhase.Prepare);
     }
 
     private void Update()
@@ -39,11 +50,26 @@ public class GameManager : SceneSingleton<GameManager>
         return gameDuration;
     }
 
+    public void StartGame()
+    {
+        SetPhase(GamePhase.Playing);
+        SetPause(false);
+    }
+
     public void SetGameOver(GameOverReason reason)
     {
+        if (IsGameOver)
+            return;
+
         IsGameOver = true;
+        SetPhase(GamePhase.GameOver);
         SetPause(true);
         OnGameOverd?.Invoke(reason);
+    }
+
+    public void TogglePause()
+    {
+        SetPause(!IsPause);
     }
 
     public void SetPause(bool isPause)
@@ -52,32 +78,23 @@ public class GameManager : SceneSingleton<GameManager>
             return;
 
         IsPause = isPause;
-
-        // 核心：真正暂停游戏
         Time.timeScale = IsPause ? 0f : 1f;
-
-        // 通知外部（UI / 音效 / 输入）
         OnPauseChanged?.Invoke(IsPause);
+        Cursor.visible = IsPause;
+    }
 
-        // 鼠标状态（如果是 FPS）
-        if (IsPause)
-        {
-            Cursor.visible = true;
-        }
-        else
-        {
-            Cursor.visible = false;
-        }
+    private void SetPhase(GamePhase phase)
+    {
+        if (CurrentPhase == phase)
+            return;
+
+        CurrentPhase = phase;
+        OnPhaseChanged?.Invoke(phase);
     }
 
     protected override void OnDestroy()
     {
-        base.OnDestroy();
         Time.timeScale = 1f;
-    }
-
-    public void TogglePause()
-    {
-        SetPause(!IsPause);
+        base.OnDestroy();
     }
 }

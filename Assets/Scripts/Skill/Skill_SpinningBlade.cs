@@ -52,6 +52,8 @@ public class Skill_SpinningBlade : SkillBase
         Vector3 lookDir = rotationCenter - transform.position;
         transform.rotation = Quaternion.LookRotation(lookDir, Vector3.up);
 
+        if (!PlayerManager.Instance.IsPlayerAlive()) { return; }
+
         // DOT…À∫¶ºÏ≤‚
         Collider[] hits = Physics.OverlapSphere(transform.position, attackRadius, damageLayer);
         float currentTime = Time.time;

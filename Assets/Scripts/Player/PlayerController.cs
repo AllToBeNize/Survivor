@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     private AttributeBase attribute;
     private Vector3 moveDir;
 
-    void Awake()
+    private void Start()
     {
         controller = GetComponent<CharacterController>();
         rotationController = GetComponent<PlayerRotationController>();

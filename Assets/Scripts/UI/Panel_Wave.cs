@@ -8,7 +8,7 @@ public class Panel_Wave : MonoBehaviour
     public TextMeshProUGUI enemiesText;
     public TextMeshProUGUI countdownText;
 
-    private void OnEnable()
+    private void Start()
     {
         if (WaveManager.Instance == null) return;
 
@@ -17,7 +17,7 @@ public class Panel_Wave : MonoBehaviour
         WaveManager.Instance.OnWaveCompleted += HandleWaveCompleted;
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         if (WaveManager.Instance == null) return;
 

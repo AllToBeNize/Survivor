@@ -21,9 +21,12 @@ public class WeaponController : MonoBehaviour
     // Event triggered when weapon fires
     public event Action OnWeaponFired;
 
+    private AttributeBase attribute;
+
     private void Start()
     {
         rotationController = GetComponent<PlayerRotationController>();
+        attribute = GetComponent<AttributeBase>();
 
         if (weaponData == null)
             return;
@@ -46,10 +49,11 @@ public class WeaponController : MonoBehaviour
 
     private void Update()
     {
-        if (PlayerManager.Instance != null && !PlayerManager.Instance.IsPlayerAlive()) 
+        if (!attribute.IsAlive) 
         {
             return;
         }
+
         if (weaponData == null || rotationController == null)
             return;
 

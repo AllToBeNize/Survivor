@@ -17,7 +17,15 @@ public class PickableSkillSpawner : MonoBehaviour
 
     private void Start()
     {
-        StartCoroutine(SpawnRoutine());
+        GameManager.Instance.OnPhaseChanged += OnPhaseChanged;
+    }
+
+    private void OnPhaseChanged(GamePhase gamePhase)
+    {
+        if (gamePhase == GamePhase.Playing)
+        {
+            StartCoroutine(SpawnRoutine());
+        }
     }
 
     private IEnumerator SpawnRoutine()

@@ -17,6 +17,12 @@ public class PlayerRotationController : MonoBehaviour
     private Vector3 desiredDir;
     private RotationPriority currentPriority = RotationPriority.None;
     private bool hasRequest;
+    private AttributeBase attribute;
+
+    private void Start()
+    {
+        attribute = GetComponent<AttributeBase>();
+    }
 
     public void SetDirection(Vector3 dir, RotationPriority priority)
     {
@@ -36,7 +42,7 @@ public class PlayerRotationController : MonoBehaviour
 
     void LateUpdate()
     {
-        if (!PlayerManager.Instance.IsPlayerAlive())
+        if (!attribute.IsAlive)
         {
             return;
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,6 +34,19 @@ public class WaveManager : MonoSingleton<WaveManager>
     public event System.Action<int> OnWaveCompleted; // (waveIndex)
 
     private void Start()
+    {
+        GameManager.Instance.OnPhaseChanged += OnPhaseChanged;
+    }
+
+    private void OnPhaseChanged(GamePhase gamePhase)
+    {
+        if (gamePhase == GamePhase.Playing)
+        {
+            StartWave();
+        }
+    }
+
+    public void StartWave()
     {
         if (waveConfigs.Count > 0)
             StartCoroutine(SpawnWaveRoutine());

@@ -80,7 +80,7 @@ public class Skill_FloatingGun : SkillBase
     {
         while (isEquipped)
         {
-            if (currentTarget != null)
+            if (currentTarget != null && PlayerManager.Instance.IsPlayerAlive())
                 Shoot();
 
             yield return new WaitForSeconds(fireRate);

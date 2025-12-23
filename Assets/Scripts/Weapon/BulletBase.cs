@@ -68,6 +68,11 @@ public class BulletBase : PooledObject
             attr.TakeDamage(damageInfo);
         }
 
+        EffectManager.Instance.SpawnHitEffect(
+            transform.position,
+            Quaternion.LookRotation(-direction)
+        );
+
         Despawn(); // Recycle on any collision
     }
 }

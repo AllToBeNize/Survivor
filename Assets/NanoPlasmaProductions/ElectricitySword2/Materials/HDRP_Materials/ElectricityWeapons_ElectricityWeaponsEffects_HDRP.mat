@@ -8,14 +8,15 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ElectricityWeapons_ElectricityWeaponsEffects_HDRP
-  m_Shader: {fileID: -6465566751694194690, guid: 48e4f8ebffac97945866f5f389eb4627, type: 3}
-  m_ValidKeywords: []
+  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_ValidKeywords:
+  - _EMISSION
   m_InvalidKeywords:
   - _DISABLE_SSR_TRANSPARENT
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2450
+  m_CustomRenderQueue: -1
   stringTagMap:
     MotionVector: User
   disabledShaderPasses:
@@ -39,12 +40,36 @@ Material:
         m_Texture: {fileID: 2800000, guid: 7d7a04fe8ff1ffd41afea1fe384b4827, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Color_ID_Map:
         m_Texture: {fileID: 2800000, guid: f20fc58ef7877934c8856806526f862d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Emission_Map:
         m_Texture: {fileID: 2800000, guid: 1486a93480d6a3041ac9c40da0266d7f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Mask:
@@ -55,12 +80,24 @@ Material:
         m_Texture: {fileID: 2800000, guid: ad6bf6c8618db2e4fa0ba9b6793b6f35, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _Metallic_Map:
         m_Texture: {fileID: 2800000, guid: df5ef00290114e14ba738b1212a6e97d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Normal_Map:
         m_Texture: {fileID: 2800000, guid: ff9feb48258358b4aa7a5c0cb2ef52f1, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -91,6 +128,7 @@ Material:
     - _Brightness_1: 11.42
     - _Brightness_2: 1.77
     - _Brightness_3: 17.5
+    - _BumpScale: 1
     - _Circuit_Color_Exposure: 0
     - _Circuit_Density: 15
     - _Circuit_Opacity: 1
@@ -100,7 +138,9 @@ Material:
     - _ConservativeDepthOffsetEnable: 0
     - _CullMode: 2
     - _CullModeForward: 2
+    - _Cutoff: 0.5
     - _DepthOffsetEnable: 0
+    - _DetailNormalMapScale: 1
     - _DoubleSidedEnable: 0
     - _DoubleSidedGIMode: 0
     - _DoubleSidedNormalMode: 2
@@ -118,8 +158,13 @@ Material:
     - _Emission_Opacity_Minimum: 0.102
     - _EnableBlendModePreserveSpecularLighting: 1
     - _EnableFogOnTransparent: 1
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
     - _Metallic: 0.916
+    - _Mode: 0
     - _Normal_Map_Strength: 1
+    - _OcclusionStrength: 1
     - _OpaqueCullMode: 2
     - _Orb_Color_Exposure: 1
     - _Orb_Density: 1
@@ -131,6 +176,7 @@ Material:
     - _Orb_Scale: 2
     - _Orb_Speed_X: 0.1
     - _Orb_Speed_Y: 0.1
+    - _Parallax: 0.02
     - _Pulsing_Enabled: 1
     - _Pulsing_Maximum: 0.748
     - _Pulsing_Minimum: 0.179
@@ -145,6 +191,8 @@ Material:
     - _RequireSplitLighting: 0
     - _Roughness: 0.797
     - _Smoothness: 0.468
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _StencilRef: 0
     - _StencilRefDepth: 8
@@ -166,6 +214,7 @@ Material:
     - _TransparentSortPriority: 0
     - _TransparentWritingMotionVec: 0
     - _TransparentZWrite: 0
+    - _UVSec: 0
     - _UseShadowThreshold: 0
     - _ZTestDepthEqualForOpaque: 3
     - _ZTestGBuffer: 4
@@ -176,6 +225,7 @@ Material:
     - _Base_Color_2: {r: 0.8666667, g: 0.54509807, b: 0.16078427, a: 0}
     - _Base_Color_3: {r: 0.18039218, g: 0.24313727, b: 0.29411766, a: 0}
     - _Circuit_Color: {r: 0.9150943, g: 0, b: 0, a: 0}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _Electricity_Color: {r: 0, g: 0.3019608, b: 0.7490196, a: 1}
     - _Electricity_Speed: {r: 0.1, g: 0.2, b: 0, a: 0}

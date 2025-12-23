@@ -13,16 +13,22 @@ public class Node_PlayerHealth : MonoBehaviour
     private AttributeBase playerAttribute;
     private List<Coroutine> activeCoroutines = new List<Coroutine>();
 
-    private void Start()
+    private bool isInit = false;
+
+    private void Update()
     {
-        playerAttribute = PlayerManager.Instance.GetPlayerAttribute();
-        healthPerImage = Mathf.CeilToInt(playerAttribute.MaxHP / (float)healthImages.Count);
+        if (!isInit)
+        {
+            isInit = true;
+            playerAttribute = PlayerManager.Instance.GetPlayerAttribute();
+            healthPerImage = Mathf.CeilToInt(playerAttribute.MaxHP / (float)healthImages.Count);
 
-        // Subscribe to events
-        playerAttribute.OnDamageTaken += OnHealthChanged;
-        playerAttribute.OnHeal += OnHealthChanged;
+            // Subscribe to events
+            playerAttribute.OnDamageTaken += OnHealthChanged;
+            playerAttribute.OnHeal += OnHealthChanged;
 
-        UpdateHealthUIInstant();
+            UpdateHealthUIInstant();
+        }
     }
 
     private void OnHealthChanged(float _)

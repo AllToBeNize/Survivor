@@ -59,12 +59,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41ead6e5566120244a5b9543ff11847d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionRadius: 5
-  explosionDamage: 50
+  explosionRadius: 10
+  explosionDamage: 80
   explosionDelay: 0
   damageLayer:
     serializedVersion: 2
     m_Bits: 128
+  pushForce: 80
   explosionEffect: {fileID: 162584487599433031, guid: 39f852c28f9c3fd45a427c24f3564ba7, type: 3}
 --- !u!1001 &577485681114890376
 PrefabInstance:

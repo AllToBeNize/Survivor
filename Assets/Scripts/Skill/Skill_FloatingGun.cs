@@ -28,9 +28,14 @@ public class Skill_FloatingGun : SkillBase
     private Vector3 followOffset;
     private Quaternion initialRotation;
 
+    private AttributeBase attribute;
+
     protected override void OnEquip()
     {
         if (owner == null) return;
+
+        attribute = owner.GetComponent<AttributeBase>();
+        attribute.OnDead += OnDead;
 
         // ¼ÇÂ¼Æ«ÒÆ
         followOffset = transform.position - owner.position;
@@ -45,6 +50,11 @@ public class Skill_FloatingGun : SkillBase
         initialRotation = transform.rotation;
 
         fireRoutine = StartCoroutine(FireRoutine());
+    }
+
+    private void OnDead()
+    {
+        gameObject.SetActive(false);
     }
 
     private void Update()

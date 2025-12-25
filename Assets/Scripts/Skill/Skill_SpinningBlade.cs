@@ -17,11 +17,18 @@ public class Skill_SpinningBlade : SkillBase
     private Vector3 rotationCenter;      // World-space rotation center
     private float currentAngle = 0f;     // 自身角度
 
-    // 记录敌人上次受伤时间，避免每帧叠加
     private Dictionary<AttributeBase, float> enemyLastDamageTime = new Dictionary<AttributeBase, float>();
+
+    private AttributeBase attribute;
 
     protected override void OnEquip()
     {
+        if (owner != null)
+        {
+            attribute = owner.GetComponent<AttributeBase>();
+            attribute.OnDead += OnDead;
+        }
+
         if (mountPoint != null)
         {
             rotationCenter = mountPoint.position + Vector3.up * heightOffset;
@@ -30,6 +37,11 @@ public class Skill_SpinningBlade : SkillBase
             transform.SetParent(null);
             transform.LookAt(rotationCenter, Vector3.up);
         }
+    }
+
+    private void OnDead()
+    {
+        gameObject.SetActive(false);
     }
 
     private void Update()

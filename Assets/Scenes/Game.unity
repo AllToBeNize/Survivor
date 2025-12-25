@@ -4854,7 +4854,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1910876634989950516, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 384
+      value: 682
       objectReference: {fileID: 0}
     - target: {fileID: 1910876634989950516, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
       propertyPath: m_ConstrainProportionsScale
@@ -4864,6 +4864,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: c18670a8c88d8c84a80066412fa1762d, type: 3}
+    - target: {fileID: 3612457831758767933, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3612457831758767933, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
       propertyPath: m_PreserveAspect
       value: 1
@@ -4912,6 +4916,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: c18670a8c88d8c84a80066412fa1762d, type: 3}
+    - target: {fileID: 3612457832249175651, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3612457832249175651, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
       propertyPath: m_PreserveAspect
       value: 1
@@ -5089,6 +5097,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: c18670a8c88d8c84a80066412fa1762d, type: 3}
     - target: {fileID: 3612457832850069111, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3612457832850069111, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
       propertyPath: m_PreserveAspect
       value: 1
       objectReference: {fileID: 0}
@@ -5096,6 +5108,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: c18670a8c88d8c84a80066412fa1762d, type: 3}
+    - target: {fileID: 3612457832894788846, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3612457832894788846, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
       propertyPath: m_PreserveAspect
       value: 1
@@ -5144,6 +5160,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: c18670a8c88d8c84a80066412fa1762d, type: 3}
+    - target: {fileID: 3612457832996391881, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
+      propertyPath: m_RaycastTarget
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3612457832996391881, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
       propertyPath: m_PreserveAspect
       value: 1
@@ -5214,7 +5234,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3612457833190094836, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 819.2947
+      value: 167
       objectReference: {fileID: 0}
     - target: {fileID: 3612457833190094836, guid: 8eecdf890266467488e0a8cb2c51ef55, type: 3}
       propertyPath: m_ConstrainProportionsScale

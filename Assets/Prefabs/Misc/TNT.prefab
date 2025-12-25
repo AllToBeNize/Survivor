@@ -65,7 +65,8 @@ MonoBehaviour:
   damageLayer:
     serializedVersion: 2
     m_Bits: 128
-  pushForce: 80
+  pushForce: 30
+  upwardModifier: 0.5
   explosionEffect: {fileID: 162584487599433031, guid: 39f852c28f9c3fd45a427c24f3564ba7, type: 3}
 --- !u!1001 &577485681114890376
 PrefabInstance:

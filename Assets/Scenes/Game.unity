@@ -10094,6 +10094,10 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 5829865381821186172, guid: 7759cc775627f5c4ca5dcc8dd462245b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 4a26ffeeb5ee3e74a9958f61c99b7031, type: 2}
     - target: {fileID: 6436287092328297369, guid: 7759cc775627f5c4ca5dcc8dd462245b, type: 3}
       propertyPath: m_RootOrder
       value: 10
@@ -10142,6 +10146,10 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 8121517296248644391, guid: 7759cc775627f5c4ca5dcc8dd462245b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9f08db1e8c04e7541add39c46d93a2b8, type: 2}
     - target: {fileID: 8356042243407570684, guid: 7759cc775627f5c4ca5dcc8dd462245b, type: 3}
       propertyPath: m_Name
       value: GameMap

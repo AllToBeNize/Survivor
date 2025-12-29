@@ -74,6 +74,13 @@ public class PlayerAnimationController : MonoBehaviour
 
     private void OnDead()
     {
+        for (int i = 1; i < animator.layerCount; i++)
+        {
+            animator.SetLayerWeight(i, 0f);
+        }
+
+        animator.ResetTrigger("Shoot");
+
         animator?.SetTrigger("Die");
 
         StartCoroutine(DelayedGameOver(deathDelay));

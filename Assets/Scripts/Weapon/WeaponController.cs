@@ -10,13 +10,15 @@ public class WeaponController : MonoBehaviour
     [Header("Target")]
     public LayerMask enemyLayer;
 
+    public Transform MuzzlePoint;
+
     private PlayerRotationController rotationController;
 
     private float fireTimer;
 
     private Transform mountPoint;
-    private GameObject weaponModelInstance;
-    private Transform muzzlePoint;
+    //private GameObject weaponModelInstance;
+    //private Transform muzzlePoint;
 
     // Event triggered when weapon fires
     public event Action OnWeaponFired;
@@ -33,18 +35,18 @@ public class WeaponController : MonoBehaviour
 
         mountPoint = transform.Find(weaponData.mountPointName) ?? transform;
 
-        if (weaponData.modelPrefab != null)
-        {
-            weaponModelInstance = Instantiate(weaponData.modelPrefab, mountPoint.position, mountPoint.rotation, mountPoint);
+        //if (weaponData.modelPrefab != null)
+        //{
+        //    weaponModelInstance = Instantiate(weaponData.modelPrefab, mountPoint.position, mountPoint.rotation, mountPoint);
 
-            muzzlePoint = string.IsNullOrEmpty(weaponData.muzzlePointName)
-                ? weaponModelInstance.transform
-                : weaponModelInstance.transform.Find(weaponData.muzzlePointName) ?? weaponModelInstance.transform;
-        }
-        else
-        {
-            muzzlePoint = transform;
-        }
+        //    muzzlePoint = string.IsNullOrEmpty(weaponData.muzzlePointName)
+        //        ? weaponModelInstance.transform
+        //        : weaponModelInstance.transform.Find(weaponData.muzzlePointName) ?? weaponModelInstance.transform;
+        //}
+        //else
+        //{
+        //    muzzlePoint = transform;
+        //}
     }
 
     private void Update()
@@ -100,15 +102,15 @@ public class WeaponController : MonoBehaviour
         if (BulletManager.Instance == null)
             return;
 
-        Vector3 spawnPos = (muzzlePoint != null ? muzzlePoint.position : transform.position) +
-                           (muzzlePoint != null ? muzzlePoint.forward : transform.forward) * 0f +
-                           weaponData.shootOffset;
+        //Vector3 spawnPos = (muzzlePoint != null ? muzzlePoint.position : transform.position) +
+        //                   (muzzlePoint != null ? muzzlePoint.forward : transform.forward) * 0f +
+        //                   weaponData.shootOffset;
 
-        Vector3 forwardDir = muzzlePoint != null ? muzzlePoint.forward : transform.forward;
+        //Vector3 forwardDir = muzzlePoint != null ? muzzlePoint.forward : transform.forward;
 
         DamageInfo dmg = new DamageInfo(weaponData.damage, gameObject);
 
-        BulletManager.Instance.SpawnBullet(spawnPos, forwardDir.normalized, dmg, weaponData.bulletSpeed);
+        BulletManager.Instance.SpawnBullet(MuzzlePoint.position, MuzzlePoint.forward.normalized, dmg, weaponData.bulletSpeed);
 
         // Trigger the event
         OnWeaponFired?.Invoke();
